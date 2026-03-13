@@ -9,7 +9,8 @@ const store_passwd = process.env.STORE_PASSWORD;
 const is_live = process.env.IS_LIVE === 'true'; 
 
 // URLs - Change these if your URLs ever change
-const BACKEND_URL = "https://kodanda-backend.onrender.com";
+// URLs - Change these to your VERCEL link!
+const BACKEND_URL = "https://kodanda-school-project-v2.vercel.app";
 const FRONTEND_URL = "https://kodanda-school-project-v2.vercel.app";
 
 // 🟢 ROUTE: INITIALIZE PAYMENT
