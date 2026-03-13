@@ -4,12 +4,12 @@ const SSLCommerzPayment = require('sslcommerz-lts');
 const router = express.Router();
 const Student = require('../models/Student');
 
-const SITE_URL = "https://kodanda-school-project-v2.vercel.app";
+const SITE_URL = "https://kodanda-school-project-v2.vercel.app/";
 
 // ... the rest of your routes below
 
 // Use your Vercel URL
-const SITE_URL = "https://kodanda-school-project-v2.vercel.app";
+const SITE_URL = "https://kodanda-school-project-v2.vercel.app/";
 
 // 🟢 ROUTE: INITIALIZE PAYMENT
 router.post('/init', async (req, res) => {
