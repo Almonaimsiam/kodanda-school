@@ -22,7 +22,6 @@ router.post('/init', async (req, res) => {
             total_amount: amount,
             currency: 'BDT',
             tran_id: tran_id,
-            // SSLCommerz needs to hit your BACKEND to process the data
             success_url: `${BACKEND_URL}/api/payment/success/${tran_id}`,
             fail_url: `${BACKEND_URL}/api/payment/fail/${tran_id}`,
             cancel_url: `${BACKEND_URL}/api/payment/cancel`,
@@ -56,7 +55,7 @@ router.post('/init', async (req, res) => {
     }
 });
 
-// 🟢 ROUTE: PAYMENT SUCCESS (SSLCommerz hits this, then we send user to Vercel)
+// 🟢 ROUTE: PAYMENT SUCCESS (FIXED REDIRECT URL)
 router.post('/success/:tran_id', async (req, res) => {
     try {
         const studentId = req.body.value_a;
@@ -67,8 +66,8 @@ router.post('/success/:tran_id', async (req, res) => {
             { tuitionFeePaid: true }
         );
 
-        // Redirect user to the FRONTEND (Vercel) success page
-        res.redirect(`${FRONTEND_URL}/payment-success`);
+        // ✅ FIX: Added the Transaction ID to the URL!
+        res.redirect(`${FRONTEND_URL}/payment-success/${req.params.tran_id}`);
     } catch (error) {
         console.error("Payment Success Error:", error);
         res.redirect(`${FRONTEND_URL}/payment-fail`);
