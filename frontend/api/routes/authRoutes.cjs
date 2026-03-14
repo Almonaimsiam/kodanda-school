@@ -4,7 +4,7 @@
 const express = require('express');
 const bcrypt = require('bcryptjs'); // For hiding passwords
 const jwt = require('jsonwebtoken'); // For login sessions
-const Student = require('../models/Student'); // Import our Database Model
+const Student = require('../models/Student.cjs'); // Import our Database Model
 
 const router = express.Router();
 

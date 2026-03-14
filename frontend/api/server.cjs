@@ -19,8 +19,8 @@ mongoose.connect(process.env.MONGO_URI)
   .catch((err) => console.log("❌ MongoDB Connection Error: ", err));
 
 // 3. Routes 
-app.use('/api/auth', require('./routes/authRoutes'));
-app.use('/api/payment', require('./routes/paymentRoutes'));
+app.use('/api/auth', require('./routes/authRoutes.cjs'));
+app.use('/api/payment', require('./routes/paymentRoutes.cjs'));
 
 // Simple Test Route
 app.get('/api', (req, res) => {

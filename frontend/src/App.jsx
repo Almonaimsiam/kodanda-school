@@ -27,8 +27,8 @@ function App() {
             
             {/* Payment Routes */}
             <Route path="/payment" element={<Payment />} />
+            {/* Fixed the dynamic route syntax below */}
             <Route path="/payment-success/:tranId" element={<PaymentSuccess />} />
-            <Route path="/payment-success" element={<PaymentSuccess />} /> 
             <Route path="/payment-fail" element={<PaymentFail />} />
             
             {/* Placeholders */}

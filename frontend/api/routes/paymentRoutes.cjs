@@ -1,11 +1,7 @@
-// 🟦 [TEMPLATE: FINAL_CRASH_PROOF_PAYMENT]
 const express = require('express');
 const SSLCommerzPayment = require('sslcommerz-lts');
 const router = express.Router();
-const Student = require('../models/Student');
-
-// ✅ NO SLASH AT THE END OF THIS LINK!
-const SITE_URL = "https://kodanda-school-project-v2.vercel.app";
+const Student = require('../models/Student.cjs');
 
 // 🟢 ROUTE: INITIALIZE PAYMENT
 router.post('/init', async (req, res) => {
@@ -13,12 +9,17 @@ router.post('/init', async (req, res) => {
         const { studentId, name, amount } = req.body;
         const tran_id = `REF_${Date.now()}`;
 
+        // Fixed: Use the base URL for the API callbacks
+        const SITE_URL = process.env.NODE_ENV === 'production' 
+            ? "https://kodanda-school-project-v2.vercel.app" 
+            : "http://localhost:5000";
+
         const data = {
             total_amount: amount,
             currency: 'BDT',
             tran_id: tran_id,
-            success_url: `${SITE_URL}/api/payment/success/${tran_id}`,
-            fail_url: `${SITE_URL}/api/payment/fail/${tran_id}`,
+            success_url: `${SITE_URL}/api/payment/success`, // SSLCommerz will POST to this
+            fail_url: `${SITE_URL}/api/payment/fail`,
             cancel_url: `${SITE_URL}/api/payment/cancel`,
             ipn_url: `${SITE_URL}/api/payment/ipn`,
             shipping_method: 'No',
@@ -39,44 +40,43 @@ router.post('/init', async (req, res) => {
         sslcz.init(data).then(apiResponse => {
             res.status(200).json({ paymentUrl: apiResponse.GatewayPageURL });
         }).catch(err => {
-            console.error("SSL Init Error:", err);
             res.status(500).json({ message: "SSLCommerz Initialization Failed" });
         });
 
     } catch (error) {
-        console.error(error);
         res.status(500).json({ message: "Server error during payment init" });
     }
 });
 
-// 🟢 ROUTE: PAYMENT SUCCESS (CRASH-PROOF REDIRECT)
-router.post('/success/:tran_id', async (req, res) => {
-    try {
-        const studentId = req.body.value_a;
+// 🟢 ROUTE: PAYMENT SUCCESS
+router.post('/success', async (req, res) => {
+    // SSLCommerz sends the tran_id in the body
+    const { tran_id, value_a } = req.body;
+    
+    // Update Student Database Logic (uncomment when ready)
+    // await Student.updateOne({ studentId: value_a }, { tuitionFeePaid: true });
 
-        if (studentId) {
-            await Student.findOneAndUpdate(
-                { studentId: studentId }, 
-                { tuitionFeePaid: true }
-            );
-        }
+    const frontendURL = process.env.NODE_ENV === 'production' 
+        ? "https://kodanda-school-project-v2.vercel.app" 
+        : "http://localhost:5173";
 
-        // Redirect safely back to React
-        res.redirect(302, `${SITE_URL}/payment-success/${req.params.tran_id}`);
-    } catch (error) {
-        console.error("Payment Success Error:", error);
-        res.redirect(302, `${SITE_URL}/payment-fail`);
-    }
+    // Redirect to the React page
+    res.redirect(`${frontendURL}/payment-success/${tran_id}`);
 });
 
-// 🔴 ROUTE: PAYMENT FAIL
-router.post('/fail/:tran_id', async (req, res) => {
-    res.redirect(302, `${SITE_URL}/payment-fail`);
+// 🔴 ROUTE: PAYMENT FAIL & CANCEL
+router.post('/fail', async (req, res) => {
+    const frontendURL = process.env.NODE_ENV === 'production' 
+        ? "https://kodanda-school-project-v2.vercel.app" 
+        : "http://localhost:5173";
+    res.redirect(`${frontendURL}/payment-fail`);
 });
 
-// 🟡 ROUTE: PAYMENT CANCEL
 router.post('/cancel', async (req, res) => {
-    res.redirect(302, `${SITE_URL}/payment-fail`);
+    const frontendURL = process.env.NODE_ENV === 'production' 
+        ? "https://kodanda-school-project-v2.vercel.app" 
+        : "http://localhost:5173";
+    res.redirect(`${frontendURL}/payment-fail`);
 });
 
 module.exports = router;
